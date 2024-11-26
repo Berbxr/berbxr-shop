@@ -401,6 +401,7 @@ function comprar() {
             mostrarAlerta("Compra realizada con éxito", "success");
             carrito = [];
             actualizarCarrito();
+            vaciarCarrito();
         })
         .catch((error) => {
             console.error("Error al guardar la compra:", error);
