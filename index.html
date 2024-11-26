@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Berbxrs Games</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-black" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Berbxrs Games</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" href="#" onclick="cargarVista('catalogo')">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="cargarVista('promociones')">Promociones</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="cargarVista('nuevos')">Nuevos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="cargarVista('mas-vendidos')">Más Vendidos</a></li>
+        </ul>
+        <form class="d-flex" id="searchForm" onsubmit="buscarJuego(event)">
+          <input class="form-control me-2" type="search" placeholder="Buscar juego" aria-label="Buscar" id="searchInput">
+          <button class="btn btn-outline-light" type="submit">Buscar</button>
+        </form>
+        <ul class="navbar-nav" id="nav-auth">
+          <li class="nav-item">
+            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalLogin">Iniciar Sesión</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalRegister">Crear Cuenta</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="banner-navidad text-center py-3">
+    🎄 ¡Felices Fiestas! 🎅 Aprovecha nuestras promociones navideñas y encuentra los mejores juegos para regalar. 🎁
+  </div>
+
+  <main id="vista-principal" class="container">
+    <div class="row" id="contenedor-juegos"></div>
+    <div class="row d-none" id="contenedor-compras"></div>
+  </main>
+
+
+  <!-- Modal Configurar Perfil -->
+  <div class="modal fade" id="modalConfigurarPerfil" tabindex="-1" aria-labelledby="modalConfigurarPerfilLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalConfigurarPerfilLabel">Configurar Perfil</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formConfigurarPerfil">
+            <div class="mb-3">
+              <label for="configNombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="configNombre" required>
+            </div>
+            <div class="mb-3">
+              <label for="configApellido" class="form-label">Apellido</label>
+              <input type="text" class="form-control" id="configApellido" required>
+            </div>
+            <div class="mb-3">
+              <label for="configEdad" class="form-label">Edad</label>
+              <input type="number" class="form-control" id="configEdad" required>
+            </div>
+            <div class="mb-3">
+              <label for="configNacionalidad" class="form-label">Nacionalidad</label>
+              <input type="text" class="form-control" id="configNacionalidad" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+ <!-- Modal del Carrito -->
+  <div class="modal fade" id="modalCarrito" tabindex="-1" aria-labelledby="modalCarritoLabel" aria-hidden="true"> 
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCarritoLabel">Carrito de Compras</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul id="listaCarrito" class="list-group"></ul>
+        <div class="mt-3">
+          <h5 id="totalPagar">Total a pagar: $0.00</h5>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="vaciarCarrito()">Vaciar Carrito</button>
+        <button type="button" class="btn btn-success" onclick="comprar()">Comprar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Modal de Iniciar Sesión -->
+  <div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLoginLabel">Iniciar Sesión</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Correo Electrónico</label>
+              <input type="email" class="form-control" id="loginEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" id="loginPassword" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Crear Cuenta -->
+  <div class="modal fade" id="modalRegister" tabindex="-1" aria-labelledby="modalRegisterLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalRegisterLabel">Crear Cuenta</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="registerForm">
+            <div class="mb-3">
+              <label for="registerName" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="registerName" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerSurname" class="form-label">Apellido</label>
+              <input type="text" class="form-control" id="registerSurname" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerNationality" class="form-label">Nacionalidad</label>
+              <input type="text" class="form-control" id="registerNationality" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerAge" class="form-label">Edad</label>
+              <input type="number" class="form-control" id="registerAge" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerEmail" class="form-label">Correo Electrónico</label>
+              <input type="email" class="form-control" id="registerEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPassword" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" id="registerPassword" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Registrar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-light py-4">
+    <div class="container text-center">
+      <p>© 2024 Berbxrs Games. Todos los derechos reservados.</p>
+      <p>Contacto: <a href="mailto:soporte@berbxrsgames.com" class="text-light">soporte@berbxrsgames.com</a></p>
+      <p>Teléfono: <a href="tel:+525512345678" class="text-light">+52 686 163 16 29</a></p>
+      <div class="social-icons mt-3">
+        <a href="#" class="text-light me-3"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="text-light me-3"><i class="bi bi-twitter"></i></a>
+        <a href="#" class="text-light"><i class="bi bi-instagram"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

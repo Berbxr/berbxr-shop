@@ -1,0 +1,65 @@
+/* General */
+body {
+    background-color: rgb(170, 81, 206);
+    font-family: Arial, sans-serif;
+}
+
+.navbar {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Banner */
+.banner {
+    background: linear-gradient(45deg, #453792, #644f86);
+    padding: 40px;
+}
+
+/* Categorías */
+.row div {
+    cursor: pointer;
+    padding: 20px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.row div:hover {
+    transform: scale(1.1);
+}
+
+/* Tarjetas */
+.card {
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.card-body {
+    text-align: center;
+}
+
+/* Footer */
+footer {
+    background-color: #6610f2;
+    color: white;
+    padding: 20px;
+}
+
+.banner-navidad {
+    background-color: #ff4d4d; /* Rojo navideño */
+    color: #fff; /* Texto blanco */
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-bottom: 2px solid #e63946; /* Línea decorativa */
+}
+
+.banner-navidad:hover {
+    background-color: #e63946; /* Cambio de tono al pasar el cursor */
+    color: #ffec99; /* Cambio de color del texto */
+}
